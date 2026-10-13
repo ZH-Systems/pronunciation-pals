@@ -1,0 +1,30 @@
+{
+  "expo": {
+    "name": "Pronunciation Pals",
+    "slug": "pronunciation-pals",
+    "scheme": "pronunciationpals",
+    "version": "0.1.0",
+    "orientation": "portrait",
+    "userInterfaceStyle": "light",
+    "ios": {
+      "supportsTablet": true,
+      "bundleIdentifier": "ca.zhsystems.pronunciationpals",
+      "infoPlist": {
+        "NSMicrophoneUsageDescription": "Record a short speech-practice attempt for immediate playback and adult review."
+      }
+    },
+    "plugins": [
+      "expo-router",
+      [
+        "expo-audio",
+        {
+          "microphonePermission": "Allow Pronunciation Pals to record a speech-practice attempt for playback. ",
+          "enableBackgroundRecording": false
+        }
+      ]
+    ],
+    "experiments": {
+      "typedRoutes": true
+    }
+  }
+}
