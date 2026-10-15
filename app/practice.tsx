@@ -21,9 +21,9 @@ export default function Practice(){
  const record=async()=>{try{const permission=await AudioModule.requestRecordingPermissionsAsync();if(!permission.granted)return Alert.alert('Microphone access','Enable microphone permission to record an attempt.');setUri(null);await recorder.prepareToRecordAsync();recorder.record();}catch(e){Alert.alert('Recording unavailable',String(e));}};
  const stop=async()=>{try{await recorder.stop();setUri(recorder.uri??null);}catch(e){Alert.alert('Could not finish recording',String(e));}};
  const next=async()=>{if(!child)return; if(!rating)return Alert.alert('Adult evaluation','Choose a rating, or mark this attempt as skipped.');try{await addAttempt({childId:child.id,exerciseId:exercise.id,rating,cue});setCompleted(x=>x+1);setSaved(true);setUri(null);setRating(null);setCue('independent');if(index<words.length-1)setIndex(x=>x+1);else router.replace('/finished');}catch(e){Alert.alert('Could not save',String(e));}};
- if(!exercise)return <View style={st.root}><Text>No exercises assigned for this sound.</Text><Pressable onPress={()=>router.back()}><Text>Back</Text></Pressable></View>;
+ if(!exercise)return <View style={st.root}><Text>No exercises assigned for this sound.</Text><Pressable onPress={()=>router.replace('/')}><Text>Back</Text></Pressable></View>;
  return <ScrollView style={st.root} contentContainerStyle={st.content}>
-   <View style={st.top}><Pressable onPress={()=>router.back()}><Text style={st.back}>← Back</Text></Pressable><Text style={st.counter}>{index+1} / {words.length}</Text></View>
+   <View style={st.top}><Pressable onPress={()=>router.replace('/')}><Text style={st.back}>← Back</Text></Pressable><Text style={st.counter}>{index+1} / {words.length}</Text></View>
    <View style={st.progress}><View style={[st.filled,{width:`${(index/words.length)*100}%`}]}/></View>
    <Text style={st.kicker}>SOUND ADVENTURE · /{target}/</Text>
    <Text style={st.heading}>Say the word!</Text>
