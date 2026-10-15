@@ -5,6 +5,7 @@ import {getBridgePrompts,levels} from '../src/data/soundBridge';
 import {useApp} from '../src/store/AppProvider';
 import {ChildRecording} from '../src/components/ChildRecording';
 import {SoundBridgeTutorial} from '../src/components/SoundBridgeTutorial';
+import {BridgeCrossing} from '../src/components/BridgeCrossing';
 import {theme as t} from '../src/ui/theme';
 
 export default function Bridge(){
@@ -15,16 +16,20 @@ export default function Bridge(){
  const assignment=assignments.find(a=>a.childId===child?.id&&a.sound===selectedSound)?.config??{sound:selectedSound,position:'initial' as const,level:'word' as const,shape:'CVC' as const,support:'model' as const};
  const prompts=getBridgePrompts(assignment);
  const [index,setIndex]=useState(0);
+ const [celebrating,setCelebrating]=useState(false);
+ const [crossed,setCrossed]=useState(0);
  const prompt=prompts[index];
- const next=()=>index+1>=prompts.length?router.replace('/finished'):setIndex(i=>i+1);
+ const next=()=>{setCelebrating(false);if(index+1>=prompts.length)router.replace('/finished');else setIndex(i=>i+1);};
+ const saveRecording=async(recordingUri:string)=>{if(!child||!prompt)return;await addAttempt({childId:child.id,exerciseId:prompt.id,recordingUri,rating:null,cue:null});setCrossed(index+1);setCelebrating(true);};
  return <><ScrollView style={s.root} contentContainerStyle={s.content}>
    <Pressable onPress={()=>router.replace('/')}><Text style={s.link}>← Clubhouse</Text></Pressable>
    <Text style={s.eyebrow}>🌉 SOUND BRIDGE</Text>
    <Text style={s.title}>{assignment.level.toUpperCase()} ISLAND</Text>
    <Text style={s.subtitle}>/{selectedSound}/ · {assignment.level==='syllable'?assignment.shape+' syllable shape':assignment.level==='isolation'?'isolated sound':assignment.position+' position'}</Text>
    <View style={s.islands}>{levels.map((level,i)=><View key={level} style={[s.island,level===assignment.level&&s.active]}><Text style={s.islandText}>{i+1}</Text></View>)}</View>
+   <BridgeCrossing total={prompts.length} completed={crossed} celebrating={celebrating}/>
    {prompt&&child?<><View style={s.card}><Text style={s.emoji}>{prompt.emoji}</Text><Text style={s.word}>{prompt.label}</Text><Text style={s.cue}>{prompt.cue}</Text><Text style={s.count}>Stepping stone {index+1} of {prompts.length}</Text></View>
-   <ChildRecording key={prompt.id} childId={child.id} exerciseId={prompt.id} onComplete={recordingUri=>addAttempt({childId:child.id,exerciseId:prompt.id,recordingUri,rating:null,cue:null})} onNext={next}/></>
+   <ChildRecording key={prompt.id} childId={child.id} exerciseId={prompt.id} onComplete={saveRecording} onNext={next}/></>
    :<View style={s.card}><Text style={s.word}>No challenges here yet</Text><Text style={s.cue}>Ask a grown-up to choose another sound position or difficulty.</Text></View>}
    <Text style={s.note}>Every try counts. Your grown-up can listen and leave feedback later.</Text>
  </ScrollView><SoundBridgeTutorial childId={child?.id??'unknown'}/></>;
