@@ -2,7 +2,6 @@ import React, { useState } from 'react';
 import { View, Text, Pressable, ScrollView, StyleSheet, TextInput, Alert } from 'react-native';
 import { router } from 'expo-router';
 import { LinearGradient } from 'expo-linear-gradient';
-import { Ionicons } from '@expo/vector-icons';
 import { useApp } from '../src/store/AppProvider';
 import { sounds } from '../src/data/curriculum';
 import { theme as t } from '../src/ui/theme';
@@ -23,6 +22,7 @@ export default function Home() {
   </LinearGradient>
   <View style={styles.row}><Text style={styles.heading}>Choose a sound</Text><Pressable onPress={()=>router.push('/parent')}><Text style={styles.link}>Parent corner  ⚙️</Text></Pressable></View>
   <View style={styles.grid}>{sounds.filter(x=>child?.selectedSounds.includes(x.id)).map(s=><Pressable onPress={()=>router.push({pathname:'/practice',params:{sound:s.id}})} key={s.id} style={styles.soundCard}><Text style={styles.soundEmoji}>{s.emoji}</Text><Text style={styles.soundTitle}>{s.title}</Text><Text style={styles.description}>{s.description}</Text></Pressable>)}</View>
+  <Pressable style={[styles.mainButton,{backgroundColor:t.teal,marginTop:20}]} onPress={()=>router.push({pathname:'/bridge',params:{sound:child?.selectedSounds[0]??'s'}})}><Text style={styles.buttonText}>🌉 Play Sound Bridge →</Text></Pressable>
   <Text style={styles.heading}>Your little explorers</Text>
   <ScrollView horizontal showsHorizontalScrollIndicator={false} style={{marginTop:14}}>{children.map(c=><Pressable onPress={()=>selectChild(c.id)} key={c.id} style={[styles.child, c.id===child?.id&&styles.selected]}><Text style={{fontSize:30}}>{c.avatar}</Text><Text style={styles.childName}>{c.name}</Text></Pressable>)}<Pressable onPress={()=>setAdding(!adding)} style={styles.child}><Text style={{fontSize:28}}>➕</Text><Text style={styles.childName}>Add pal</Text></Pressable></ScrollView>
   {adding&&<View style={styles.add}><TextInput value={name} onChangeText={setName} placeholder="Child nickname" style={styles.field} maxLength={24}/><Pressable style={styles.smallButton} onPress={async()=>{if(!name.trim())return Alert.alert('Add a nickname');await addChild(name,'🦊');setName('');setAdding(false)}}><Text style={styles.buttonText}>Add explorer</Text></Pressable></View>}
