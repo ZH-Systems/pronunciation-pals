@@ -17,7 +17,8 @@ export default function Bridge(){
  const recorder=useAudioRecorder(RecordingPresets.HIGH_QUALITY);
  const player=useAudioPlayer(uri);
  const prompt=prompts[index];
- const completed=attempts.filter(x=>x.childId===child?.id&&x.exerciseId.startsWith(`bridge-${assignment.level}`));
+ const validPromptIds=new Set(prompts.map(p=>p.id));
+ const completed=attempts.filter(x=>x.childId===child?.id&&validPromptIds.has(x.exerciseId));
  const suggestion=advancementSuggestion(completed);
  const exit=async()=>{if(recorder.isRecording){try{await recorder.stop()}catch{}}router.replace('/')};
  const start=async()=>{try{const p=await AudioModule.requestRecordingPermissionsAsync();if(!p.granted){Alert.alert('Microphone access','Enable access to record an attempt.');return}setUri(null);await recorder.prepareToRecordAsync();recorder.record()}catch(e){Alert.alert('Recording error',String(e))}};
@@ -26,7 +27,7 @@ export default function Bridge(){
  return <ScrollView style={s.root} contentContainerStyle={s.content}>
    <Pressable onPress={exit}><Text style={s.link}>← Clubhouse</Text></Pressable>
    <Text style={s.eyebrow}>🌉 SOUND BRIDGE</Text><Text style={s.title}>{assignment.level.toUpperCase()} ISLAND</Text>
-   <Text style={s.subtitle}>/{selectedSound}/ · {assignment.position} position{assignment.level==='syllable'?` · ${assignment.shape}`:''}</Text>
+   <Text style={s.subtitle}>/{selectedSound}/ · {assignment.level==='syllable'?`${assignment.shape} syllable shape`:assignment.level==='isolation'?'isolated sound':`${assignment.position} position`}</Text>
    <View style={s.islands}>{levels.map((l,i)=><View key={l} style={[s.island,l===assignment.level&&s.active]}><Text style={s.islandText}>{i+1}</Text></View>)}</View>
    {prompt?<><View style={s.card}><Text style={s.emoji}>{prompt.emoji}</Text><Text style={s.word}>{prompt.label}</Text><Text style={s.cue}>{prompt.cue}</Text><Text style={s.count}>Challenge {index+1} of {prompts.length}</Text></View>
    <Pressable onPress={recorder.isRecording?stop:start} style={s.primary}><Text style={s.primaryText}>{recorder.isRecording?'■ Stop recording':'🎤 Record an attempt'}</Text></Pressable>
