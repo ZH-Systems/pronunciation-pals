@@ -11,19 +11,19 @@ const steps=[
   {icon:'⭐',title:'Every try counts!',body:'Your grown-up chooses how the sound went and what help you used. Tap Save & next word to reach another stone. You earn a reward for trying!'}
 ];
 
-export function SoundBridgeTutorial(){
+export function SoundBridgeTutorial({childId}:{childId:string}){
   const [visible,setVisible]=useState(false);
   const [step,setStep]=useState(0);
   useEffect(()=>{
     let mounted=true;
-    AsyncStorage.getItem(KEY).then(v=>{if(mounted && v!=='seen')setVisible(true);}).catch(()=>{});
+    AsyncStorage.getItem(`${KEY}/${childId}`).then(v=>{if(mounted && v!=='seen')setVisible(true);}).catch(()=>{});
     return ()=>{mounted=false;};
-  },[]);
+  },[childId]);
   const dismiss=useCallback(()=>{
     setVisible(false);
     setStep(0);
-    AsyncStorage.setItem(KEY,'seen').catch(()=>{});
-  },[]);
+    AsyncStorage.setItem(`${KEY}/${childId}`,'seen').catch(()=>{});
+  },[childId]);
   return <>
     <Pressable accessibilityRole="button" onPress={()=>{setStep(0);setVisible(true);}} style={styles.help}>
       <Text style={styles.helpText}>❔ How to play Sound Bridge</Text>
