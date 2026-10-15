@@ -8,7 +8,7 @@ const steps=[
   {icon:'🌉',title:'Welcome to Sound Bridge!',body:'Help your pal cross the bridge. Each stepping stone is a word to practice. There is no rush!'},
   {icon:'👂',title:'Listen, then say it',body:'Ask your grown-up to say the word first. Listen carefully, then give it a try.'},
   {icon:'🎤',title:'Record and listen',body:'Tap Record attempt, say the word, then tap Stop. Tap Listen to hear yourself. You can practice again.'},
-  {icon:'⭐',title:'Every try counts!',body:'Your grown-up chooses how the sound went and what help you used. Tap Save & next word to reach another stone. You earn a reward for trying!'}
+  {icon:'⭐',title:'Every try counts!',body:'Your grown-up chooses how the sound went and what help you used. Your grown-up can review your recording later. Tap the star button and move to the next stone. Every try counts!'}
 ];
 
 export function SoundBridgeTutorial({childId}:{childId:string}){
