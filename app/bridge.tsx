@@ -5,6 +5,7 @@ import {AudioModule,RecordingPresets,useAudioPlayer,useAudioRecorder} from 'expo
 import {getBridgePrompts,levels,advancementSuggestion} from '../src/data/soundBridge';
 import {Rating,Cue,useApp} from '../src/store/AppProvider';
 import {theme as t} from '../src/ui/theme';
+import {SoundBridgeTutorial} from '../src/components/SoundBridgeTutorial';
 
 export default function Bridge(){
  const {sound}=useLocalSearchParams<{sound?:string}>();
@@ -21,11 +22,12 @@ export default function Bridge(){
  const completed=attempts.filter(x=>x.childId===child?.id&&validPromptIds.has(x.exerciseId));
  const suggestion=advancementSuggestion(completed);
  const exit=async()=>{if(recorder.isRecording){try{await recorder.stop()}catch{}}router.replace('/')};
- const start=async()=>{try{const p=await AudioModule.requestRecordingPermissionsAsync();if(!p.granted){Alert.alert('Microphone access','Enable access to record an attempt.');return}setUri(null);await recorder.prepareToRecordAsync();recorder.record()}catch(e){Alert.alert('Recording error',String(e))}};
+ const start=async()=>{try{const p=await AudioModule.requestRecordingPermissionsAsync();if(!p.granted){Alert.alert('Microphone access','Enable access to record an attempt.');return}setUri(null);await AudioModule.setAudioModeAsync({allowsRecording:true,playsInSilentMode:true});await recorder.prepareToRecordAsync();recorder.record()}catch(e){Alert.alert('Recording error',String(e))}};
  const stop=async()=>{try{await recorder.stop();setUri(recorder.uri??null)}catch(e){Alert.alert('Recording error',String(e))}};
  const save=async()=>{if(!child||!prompt||!rating||saving)return;setSaving(true);try{await addAttempt({childId:child.id,exerciseId:prompt.id,rating,cue});setRating(null);setUri(null);setCue(assignment.support);if(index+1>=prompts.length)router.replace('/finished');else setIndex(i=>i+1)}catch(e){Alert.alert('Save error',String(e))}finally{setSaving(false)}};
  return <ScrollView style={s.root} contentContainerStyle={s.content}>
    <Pressable onPress={exit}><Text style={s.link}>← Clubhouse</Text></Pressable>
+   <SoundBridgeTutorial childId={child?.id} />
    <Text style={s.eyebrow}>🌉 SOUND BRIDGE</Text><Text style={s.title}>{assignment.level.toUpperCase()} ISLAND</Text>
    <Text style={s.subtitle}>/{selectedSound}/ · {assignment.level==='syllable'?`${assignment.shape} syllable shape`:assignment.level==='isolation'?'isolated sound':`${assignment.position} position`}</Text>
    <View style={s.islands}>{levels.map((l,i)=><View key={l} style={[s.island,l===assignment.level&&s.active]}><Text style={s.islandText}>{i+1}</Text></View>)}</View>
