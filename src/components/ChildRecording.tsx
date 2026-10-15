@@ -4,7 +4,7 @@ import {AudioModule,RecordingPresets,setAudioModeAsync,useAudioPlayer,useAudioRe
 import * as FileSystem from 'expo-file-system/legacy';
 import {theme as t} from '../ui/theme';
 
-type Props={childId:string;exerciseId:string;onComplete:(recordingUri:string)=>Promise<void>};
+type Props={childId:string;exerciseId:string;onComplete:(recordingUri:string)=>Promise<void>;onNext:()=>void};
 const encode=(data:number[])=>{
  const abc='ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/';
  let result='';
@@ -24,7 +24,7 @@ async function chime(){
  await FileSystem.writeAsStringAsync(path,encode(bytes),{encoding:FileSystem.EncodingType.Base64});
  return path;
 }
-export function ChildRecording({childId,exerciseId,onComplete}:Props){
+export function ChildRecording({childId,exerciseId,onComplete,onNext}:Props){
  const recorder=useAudioRecorder(RecordingPresets.HIGH_QUALITY);
  const state=useAudioRecorderState(recorder);
  const [uri,setUri]=useState<string|null>(null),[busy,setBusy]=useState(false),[replayed,setReplayed]=useState(false),[finished,setFinished]=useState(false);
@@ -69,6 +69,7 @@ export function ChildRecording({childId,exerciseId,onComplete}:Props){
   <Text style={styles.title}>{finished?'🌟 Great job!':'🎤 Your turn!'}</Text>
   <Text style={styles.caption}>{finished?'Your recording is saved for your grown-up to review.':'Say your word, then stop the recording.'}</Text>
   {!finished&&<Pressable disabled={busy} onPress={state.isRecording?stop:start} style={styles.primary}><Text style={styles.primaryText}>{busy?'Please wait…':state.isRecording?'■ Stop recording':'🎤 Record my voice'}</Text></Pressable>}
+  {finished&&<Pressable style={styles.primary} onPress={onNext}><Text style={styles.primaryText}>Next challenge →</Text></Pressable>}
   {!finished&&uri&&<>
    <Pressable disabled={busy||replayed} onPress={()=>{setReplayed(true);player.seekTo(0).then(()=>player.play()).catch(()=>Alert.alert('Playback failed'))}} style={styles.secondary}><Text style={styles.secondaryText}>{replayed?'✓ Listened':'▶ Listen once'}</Text></Pressable>
    <Pressable disabled={busy} onPress={done} style={styles.primary}><Text style={styles.primaryText}>⭐ Great job! Next →</Text></Pressable>
